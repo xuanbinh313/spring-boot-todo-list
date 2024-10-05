@@ -1,9 +1,12 @@
 package com.binhcodev.todo_list.services;
 
 import java.util.List;
-
 import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.binhcodev.todo_list.dtos.TodoDto;
@@ -19,20 +22,25 @@ public class TodoService {
 
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private UserService userService;
 
-    public List<Todo> getAll(String email) {
-        Optional<User> optionalUser = userRepository.findByEmail(email);
+    public Page<Todo> getAll(String term, int page, int limit) {
+        String currentEmail = userService.getCurrentUserEmail();
+        Optional<User> optionalUser = userRepository.findByEmail(currentEmail);
+        Pageable pageable = PageRequest.of(page - 1, limit);
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
-            return todoRepository.findAllByUser(user);
+            return todoRepository.findAllByUser(user.getId(), term, pageable);
         } else {
             // Handle the case where the user is not found, e.g., return an empty list
-            return List.of();
+            return Page.empty();
         }
     }
 
-    public Todo create(String email, TodoDto todoDto) {
-        Optional<User> optionalUser = userRepository.findByEmail(email);
+    public Todo create(TodoDto todoDto) {
+        String currentEmail = userService.getCurrentUserEmail();
+        Optional<User> optionalUser = userRepository.findByEmail(currentEmail);
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
             Todo todo = Todo
@@ -46,6 +54,19 @@ public class TodoService {
             // Handle the case where the user is not found, e.g., return null
             return null;
         }
+    }
+
+    public Optional<Todo> update(Long id, TodoDto todoDto) {
+        return todoRepository.findById(id).map(x -> {
+            x.setTitle(todoDto.getTitle());
+            x.setDescription(todoDto.getDescription());
+            return todoRepository.save(x);
+        });
+
+    }
+
+    public Optional<Todo> findOneTodo(Long id) {
+        return todoRepository.findById(id);
     }
 
 }

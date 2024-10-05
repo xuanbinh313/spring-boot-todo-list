@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   postgres:
-    image: postgres:15
+    image: postgres:alpine
     container_name: postgres_db
     environment:
       POSTGRES_USER: postgres
@@ -11,7 +11,4 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - todo_list_db:/var/lib/postgresql/data
-
-volumes:
-  todo_list_db:
+      - ./todo_list_db:/var/lib/postgresql/data
