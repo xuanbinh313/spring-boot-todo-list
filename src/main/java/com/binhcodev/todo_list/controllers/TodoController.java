@@ -1,16 +1,17 @@
 package com.binhcodev.todo_list.controllers;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -19,8 +20,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.binhcodev.todo_list.dtos.TodoDto;
 import com.binhcodev.todo_list.entities.Todo;
 import com.binhcodev.todo_list.services.TodoService;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.PathVariable;
+
+import jakarta.validation.Valid;
+
 
 @RestController
 @RequestMapping("/todos")
@@ -50,7 +52,7 @@ public class TodoController {
     }
 
     @PostMapping
-    public ResponseEntity<Todo> createTodoForCurrentUser(@RequestBody TodoDto todoDto) {
+    public ResponseEntity<Todo> createTodoForCurrentUser(@Valid @RequestBody TodoDto todoDto) {
         Todo todo = todoService.create(todoDto);
         return new ResponseEntity<>(todo, HttpStatus.CREATED);
     }
